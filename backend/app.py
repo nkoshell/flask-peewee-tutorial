@@ -1,46 +1,39 @@
-from flask import Flask, abort
+from flask import Flask
 from playhouse.flask_utils import FlaskDB
-from playhouse.shortcuts import model_to_dict
 
-from backend.models import db, Book, Category
-from backend.utils import json_response
+from backend.models import db
+from backend.views import BookModelApiView, CategoryModelApiView
 
 app = Flask(__name__)
 db_wrapper = FlaskDB(app=app, database=db)
 
+book_view = BookModelApiView.as_view('books')
+category_view = CategoryModelApiView.as_view('categories')
 
-@app.route('/books/')
-@json_response
-def books():
-    return [model_to_dict(book) for book in Book.select()]
+app.add_url_rule(
+    rule='/books/',
+    view_func=book_view,
+    defaults={'book_id': None},
+    methods=['GET']
+)
 
+app.add_url_rule(
+    rule='/books/<int:book_id>',
+    view_func=book_view,
+    methods=['GET']
+)
+app.add_url_rule(
+    rule='/categories/',
+    view_func=category_view,
+    defaults={'category_id': None},
+    methods=['GET']
+)
 
-@app.route('/books/<int:book_id>/')
-@json_response
-def book(book_id):
-    try:
-        book = Book.get(Book.id == book_id)
-    except Book.DoesNotExist:
-        abort(404, 'Book with id=%r does not exists' % book_id)
-    else:
-        return model_to_dict(book)
-
-
-@app.route('/categories/')
-@json_response
-def categories():
-    return [model_to_dict(category) for category in Category.select()]
-
-
-@app.route('/categories/<int:category_id>/')
-@json_response
-def category(category_id):
-    try:
-        category = Category.get(Category.id == category_id)
-    except Book.DoesNotExist:
-        abort(404, 'Category with id=%r does not exists' % category_id)
-    else:
-        return model_to_dict(category)
+app.add_url_rule(
+    rule='/categories/<int:category_id>',
+    view_func=category_view,
+    methods=['GET']
+)
 
 
 if __name__ == '__main__':
