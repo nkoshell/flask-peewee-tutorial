@@ -13,6 +13,9 @@ class Category(BaseModel):
     id = PrimaryKeyField()
     title = CharField(max_length=50)
 
+    def __str__(self):
+        return '%s(id=%r, title=%r)' % (self.__class__.__name__, self.id, self.title)
+
 
 class Book(BaseModel):
     id = PrimaryKeyField()
@@ -21,6 +24,9 @@ class Book(BaseModel):
     url = CharField()
 
     category = ForeignKeyField(Category, related_name='books', on_delete='cascade')
+
+    def __str__(self):
+        return '%s(id=%r, title=%r, ..., category=%s)' % (self.__class__.__name__, self.id, self.title, self.category)
 
 
 if __name__ == '__main__':
