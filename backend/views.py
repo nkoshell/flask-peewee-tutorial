@@ -1,9 +1,9 @@
 import copy
 
-from flask import abort, request
+from flask import request, abort
 from flask.views import MethodView
 from peewee import Model
-from playhouse.shortcuts import model_to_dict
+from playhouse.shortcuts import model_to_dict, dict_to_model
 
 from backend.utils import json_response
 
@@ -75,12 +75,8 @@ class ApiModelView(BaseModelView):
 
     def get(self, instance_id=None):
         if instance_id is not None:
-            try:
-                instance = self.model.get(self.model_meta.primary_key == instance_id)
-            except self.model.DoesNotExist:
-                abort(404, '%s with id=%r does not exist' % (self.model_meta.name, instance_id))
-            else:
-                return model_to_dict(instance)
+            instance = self.get_instance_or_404(instance_id)
+            return model_to_dict(instance)
         return self.list()
 
     def list(self):
@@ -90,6 +86,43 @@ class ApiModelView(BaseModelView):
             query = query.filter(**filters)
         instances = [model_to_dict(instance) for instance in query]
         return instances
+
+    def post(self):
+        data = request.get_json()
+        pk_name = self.model_meta.primary_key.name
+        if pk_name in data:
+            abort(400, 'Request body params does not contain %r, drop this field and try again' % pk_name)
+
+        instance = dict_to_model(self.model, data, ignore_unknown=True)
+        instance.save()
+        return model_to_dict(instance)
+
+    def put(self, instance_id):
+        instance = self.get_instance_or_404(instance_id)
+        new_instance_data = request.get_json()
+        pk_name = self.model_meta.primary_key.name
+        if instance_id != new_instance_data.get(pk_name, instance_id):
+            abort(400, 'Request body param %r must be same as url' % pk_name)
+
+        data = model_to_dict(instance)
+        data.update(new_instance_data)
+
+        updated_instance = dict_to_model(self.model, data)
+        updated_instance.save()
+        return model_to_dict(updated_instance, backrefs=True)
+
+    def delete(self, instance_id):
+        instance = self.get_instance_or_404(instance_id)
+        instance.delete_instance()
+        return model_to_dict(instance)
+
+    def get_instance_or_404(self, instance_id):
+        try:
+            instance = self.model.get(self.model_meta.primary_key == instance_id)
+        except self.model.DoesNotExist:
+            abort(404, '%s with id=%r does not exist' % (self.model_meta.name, instance_id))
+        else:
+            return instance
 
     @staticmethod
     def get_filters():
