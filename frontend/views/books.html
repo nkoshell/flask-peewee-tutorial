@@ -32,6 +32,12 @@
             <a class="nav-link" href="/views/categories.html">Categories</a>
           </li>
         </ul>
+        <button class="btn btn-outline-success"
+                data-toggle="modal"
+                data-target="#bookModal"
+                id="createBook">
+          <i class="oi oi-plus"></i>
+        </button>
         <form class="form-inline my-2 my-lg-0" id="searchBookByTitle">
           <input name="title__ilike" class="form-control mr-sm-2" type="search" placeholder="Search by book title" aria-label="Search">
           <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
@@ -55,7 +61,6 @@
           </div>
           <div class="modal-body">
             <form>
-              <input type="number" min="0" hidden id="id" name="id">
               <div class="form-group">
                 <label for="title" class="col-form-label">Title:</label>
                 <input type="text" class="form-control" id="title" name="title">
