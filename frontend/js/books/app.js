@@ -34,13 +34,25 @@
         // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
         // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
         var modal = $(this);
-        modal.find('.modal-title').text(bookId ? 'Edit book with id: ' + book.id : 'Create book');
+        modal.find('.modal-title').text(bookId ? 'Edit book with id: ' + bookId : 'Create book');
 
         var form = modal.find('form');
         form.find('#title').val(book.title);
         form.find('#description').val(book.description);
         form.find('#url').val(book.url);
         form.find('#categoriesSelector').val(book.categoryId)
+
+        modal.find('#deleteButton').toggleClass('invisible', !bookId).one('click', function (evt) {
+            evt.preventDefault();
+
+            var promise = deleteBook(bookId);
+
+            promise.done(function (data) {
+                console.log(data);
+                loadBooks();
+                modal.modal('hide');
+            })
+        })
 
         // Call on modal show, bind action every time
         // Must be one time bind .click(callback) (.on('click', callback)) -> .one('click', callback)
@@ -62,6 +74,7 @@
     $('#bookModal').on('hidden.bs.modal', function (e) {
         var modal = $(this);
         modal.find('#saveButton').off('click'); // unbind action
+        modal.find('#deleteButton').off('click'); // unbind action
     })
 
 
@@ -99,6 +112,17 @@
             method: 'PUT'
         })
     }
+
+
+    function deleteBook(bookId) {
+        return $.ajax({
+            url: apiUrl + bookId,
+            dataType: 'json',
+            method: 'DELETE'
+        })
+    }
+
+
 
     function loadBooks(params) {
         params = params || getFormData($searchForm);
