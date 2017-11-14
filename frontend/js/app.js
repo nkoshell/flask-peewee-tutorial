@@ -1,19 +1,5 @@
 (function ($) {
-     posts = [
-        {
-            author: 'Joe Bloggs',
-            date: '25th May 2013',
-            authorPicture: '',
-            post: 'This is the contents of my other post'
-        },
-        {
-            author: 'John Blogger',
-            date: '25th October 2017',
-            authorPicture: '',
-            post: 'This is the contents of my other post'
-        }
-    ]
-
-    $("#template-container").loadTemplate("/templates/book.tpl.html", posts);
-
+    console.log('Main app.js');
+    // Set api url to global ctx
+    window.apiUrl = 'http://localhost:5000/';
 })(window.jQuery);
