@@ -107,7 +107,7 @@ class ApiModelView(BaseModelView):
         data = model_to_dict(instance)
         data.update(new_instance_data)
 
-        updated_instance = dict_to_model(self.model, data)
+        updated_instance = dict_to_model(self.model, data, ignore_unknown=True)
         updated_instance.save()
         return model_to_dict(updated_instance, backrefs=True)
 
