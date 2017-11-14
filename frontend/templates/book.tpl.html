@@ -2,7 +2,22 @@
   <div class="card-body">
     <h4 class="card-title" data-content="title"></h4>
     <p class="card-text" data-content="description"></p>
+    <a href="#" data-href="url" class="float-left">Go to book</a>
     <p class="card-text text-right"><small class="text-muted" data-content="category.title"></small></p>
-    <a href="#" class="btn btn-primary" data-href="url">Go to book</a>
+    <p class="text-right">
+      <button class="btn btn-primary"
+              data-toggle="modal"
+              data-target="#bookModal"
+              data-template-bind='[
+                 {"attribute": "data-book-id", "value": "id"},
+                 {"attribute": "data-book-title", "value": "title"},
+                 {"attribute": "data-book-description", "value": "description"},
+                 {"attribute": "data-book-url", "value": "url"},
+                 {"attribute": "data-book-category-id", "value": "category.id"}
+              ]'>
+        <i class="oi oi-pencil"></i>
+        Edit book
+      </button>
+    </p>
   </div>
 </div>

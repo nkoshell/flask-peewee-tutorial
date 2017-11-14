@@ -88,7 +88,7 @@ class ApiModelView(BaseModelView):
         return instances
 
     def post(self):
-        data = request.get_json()
+        data = request.get_json(force=True)
         pk_name = self.model_meta.primary_key.name
         if pk_name in data:
             abort(400, 'Request body params does not contain %r, drop this field and try again' % pk_name)
@@ -99,7 +99,7 @@ class ApiModelView(BaseModelView):
 
     def put(self, instance_id):
         instance = self.get_instance_or_404(instance_id)
-        new_instance_data = request.get_json()
+        new_instance_data = request.get_json(force=True)
         pk_name = self.model_meta.primary_key.name
         if instance_id != new_instance_data.get(pk_name, instance_id):
             abort(400, 'Request body param %r must be same as url' % pk_name)
